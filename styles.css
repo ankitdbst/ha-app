@@ -1,0 +1,9 @@
+.ha-component-list {
+    display: inline-block;
+    border: 1px solid #acacac;
+    padding: 10px;
+}
+
+.ha-component-list__header {
+    margin: 10px 0px;
+}
