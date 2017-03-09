@@ -1,6 +1,7 @@
 var routes = {
   '/': Home,
-  '/lights': LightComponent
+  '/lights': LightComponent,
+  '/thermostat': ThermostatComponent
 };
 var $container = $('#container');
 
@@ -10,6 +11,10 @@ function Home() {
 
 function LightComponent() {
   $container.html(new LightsComponentView(new LightsModel()).render().root);
+}
+
+function ThermostatComponent() {
+  $container.html(new ThermostatComponentView(new ThermostatModel()).render().root);
 }
 
 function route() {
