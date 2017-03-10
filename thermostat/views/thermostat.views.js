@@ -1,61 +1,49 @@
 "use strict";
 (function($) {
-  function ThermostatComponentView(model) {
-    this.root = $("<div></div>");
-
-    function onTempChange() {
-      var roomId = parseInt($(this).attr("id").replace("inpTemp", ""), 10);
-      // console.log("arguments:", arguments);
-      model.set(roomId, $(this).val());
-      model.save();
-    }
-
-    function replaceAll(str, find, replace) {
-      return str.replace(new RegExp(escapeRegExp(find), 'g'), replace);
-    }
-
-    function updateView(view, room) {
-      console.log("Updating temperature value...");
-      view.root.find("#inpTemp"+room.id).val(model.get(room.id));
-      view.root.find("#spnTemp"+room.id).html(model.get(room.id));
-    }
-
-    this.initialize = function() {
-      this.root.on("change", function(evtArg) {
-        // console.log($(evtArg.srcElement).parent());
-        onTempChange.apply(evtArg.target, arguments);
-      });
-
-      var rooms = model.getAllRooms();
+  window.ThermostatComponentView = View.extend({
+    initialize: function() {
       var that = this;
+
+      this.root.on("change", function(evtArg) {
+        var target = evtArg.target;
+        // console.log($(evtArg.srcElement).parent());
+        var roomId = parseInt($(target).attr("id").replace("inpTemp", ""), 10);
+        // console.log("arguments:", arguments);
+        that.model.set(roomId, $(target).val());
+        that.model.save();
+      });
+      var rooms = this.model.getAllRooms();
       rooms.forEach(function(room) {
-        model.addSubscriber(room.id, function() {
-          updateView(that, room);
+        that.model.addSubscriber(room.id, function() {
+          that.updateView(room);
         });
       });
-    };
+    },
 
-    this.render = function() {
+    updateView: function(room) {
+      console.log("Updating temperature value...");
+      this.root.find("#inpTemp"+room.id).val(this.model.get(room.id));
+      this.root.find("#spnTemp"+room.id).html(this.model.get(room.id));
+    },
+
+    render: function() {
       this.root.html($("#thermostatComponentTemplate").html());
-      var rooms = model.getAllRooms();
+      var rooms = this.model.getAllRooms();
       // console.log("No of rooms: " + rooms.length);
       var that = this;
       rooms.forEach(function(room) {
         var roomTmpl = $("#thermostatComponentRoomsTemplate").html();
         var roomHtml = roomTmpl
-          .replace("{divThermostatRoomId}",  "divThermostatRoomId"+room.id)
-          .split("{inpTemp}").join("inpTemp"+room.id) // replaceAll
-          .replace("{roomName}", room.name)
-          .replace("{spnTemp}", "spnTemp"+room.id);
+        .replace("{divThermostatRoomId}",  "divThermostatRoomId"+room.id)
+        .split("{inpTemp}").join("inpTemp"+room.id) // replaceAll
+        .replace("{roomName}", room.name)
+        .replace("{spnTemp}", "spnTemp"+room.id);
         // console.log("Room", room);
         that.root.append(roomHtml);
-        updateView(that, room);
+        that.updateView(room);
       });
       return this;
-    };
+    }
+  });
 
-    this.initialize();
-  }
-
-  window.ThermostatComponentView = ThermostatComponentView;
 }) (jQuery);

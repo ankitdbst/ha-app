@@ -1,49 +1,44 @@
 "use strict";
 (function($) {
-  function LightsComponentView(model) {
-    this.root = $("<div></div>");
-
-    function onStatusChange() {
-      var roomId = parseInt($(this).attr("id").replace("room", ""), 10);
-      // console.log("arguments:", arguments);
-      model.set(roomId, $(this).prop("checked"));
-      model.save();
-    }
-
-    this.initialize = function() {
-      this.root.on("change", function(evtArg) {
-        // console.log($(evtArg.srcElement).parent());
-        onStatusChange.apply(evtArg.target, arguments);
-      });
-
-      var rooms = model.getAllRooms();
+  window.LightsComponentView = View.extend({
+    initialize: function() {
       var that = this;
-      rooms.forEach(function(room) {
-          model.addSubscriber(room.id, function() {
-            console.log("Updating checkbox value...");
-            that.root.find("#inpLightStatus"+room.id).prop("checked", model.get(room.id));
-          })
+      this.root.on("change", function(evtArg) {
+        var target = evtArg.target;
+        // console.log($(evtArg.srcElement).parent());
+        var roomId = parseInt($(target).attr("id").replace("inpLightStatus", ""), 10);
+        that.model.set(roomId, $(target).prop("checked"));
+        that.model.save();
       });
-    };
+      var rooms = this.model.getAllRooms();
+      rooms.forEach(function(room) {
+        that.model.addSubscriber(room.id, function() {
+          that.updateView(room);
+        });
+      });
+    },
 
-    this.render = function() {
+    updateView: function(room) {
+      console.log("Updating checkbox value...");
+      this.root.find("#inpLightStatus"+room.id).prop("checked", this.model.get(room.id));
+    },
+
+    render: function() {
       this.root.html($("#lightsComponentTemplate").html());
-      var rooms = model.getAllRooms();
+      var rooms = this.model.getAllRooms();
       // console.log("No of rooms: " + rooms.length);
       var that = this;
       rooms.forEach(function(room) {
         var roomTmpl = $("#lightsComponentRoomsTemplate").html();
-        var roomHtml = roomTmpl.
-          replace("{divLightRoomId}", "divLightRoomId"+room.id).
-          replace("{inpLightStatus}", "inpLightStatus"+room.id).
-          replace("{roomName}", room.name);
+        var roomHtml = roomTmpl
+        .replace("{divLightRoomId}", "divLightRoomId"+room.id)
+        .split("{inpLightStatus}").join("inpLightStatus"+room.id) // replaceAll
+        .replace("{roomName}", room.name);
         that.root.append(roomHtml);
+        that.updateView(room);
       });
       return this;
-    };
+    }
+  });
 
-    this.initialize();
-  }
-
-  window.LightsComponentView = LightsComponentView;
 }) (jQuery);
