@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Home Automation App</title>
-  <link rel="stylesheet" href="styles.css">
+  <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+  <link rel="stylesheet" href="ui/styles.css">
+  <link rel="stylesheet" href="ui/switch.css">
   <!-- home -->
   <script id="homeTemplate" type="text/template">
     <div class="ha-component-list__header">Currently available components:</div>
@@ -25,9 +27,10 @@
   </script>
   <script id="lightsComponentRoomsTemplate" type="text/template">
     <div class="ha-component ha-component__lights-room" id="{divLightRoomId}">
+      <input type="checkbox" id="{inpLightStatus}" class="switch" />
       <label for="{inpLightStatus}">{roomName}</label>
-      <input type="checkbox" id="{inpLightStatus}" />
     </div>
+    <div class="clear">&nbsp;</div>
   </script>
   <!--Thermostat-->
   <script id="thermostatComponentTemplate" type="text/template">
@@ -40,7 +43,8 @@
     <div class="ha-component ha-component__thermostat-room" id="{divThermostatRoomId}">
       <div>{roomName}</div>
       <div>
-        <label for="{inpTemp}">Temperature: </label>
+        <label for="{inpTemp}">Temperature</label>
+        <div></div>
         <input type="range" name="" id="{inpTemp}" min="10" max="40" value="0" />
         <span id="{spnTemp}"></span><span> &deg;C</span>
       </div>
